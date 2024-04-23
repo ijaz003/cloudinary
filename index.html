@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Upload</title>
+</head>
+<body>
+  <h1>Upload Image</h1>
+  <input type="file" id="imageInput" name="image" accept="image/*" multiple>
+  <button onclick="uploadImages()">Upload</button>
+  <div id="uploadStatus"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    async function uploadImages() {
+      const fileInput = document.getElementById('imageInput');
+      const files = fileInput.files;
+
+      if (files.length === 0) {
+        alert("Please select at least one image.");
+        return;
+      }
+
+      const formData = new FormData();
+
+      for (let i = 0; i < files.length; i++) {
+        formData.append('images', files[i]);
+      }
+
+      try {
+        const response = await axios.post('http://localhost:3000/upload', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+
+        if (response.status === 200) {
+          const uploadedImages = response.data.imageUrls;
+          const uploadStatus = document.getElementById('uploadStatus');
+          uploadStatus.innerHTML = '';
+
+          uploadedImages.forEach(imageUrl => {
+            const img = document.createElement('img');
+            img.src = imageUrl;
+            img.style.maxWidth = '200px';
+            img.style.maxHeight = '200px';
+            uploadStatus.appendChild(img);
+          });
+
+          alert("Images uploaded successfully.");
+        } else {
+          alert("Error uploading images");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("Internal server error. Please try again later.");
+      }
+    }
+  </script>
+</body>
+</html>
