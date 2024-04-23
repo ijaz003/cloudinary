@@ -61,6 +61,11 @@ app.post('/upload', upload.single('image'), async (req, res) => {
   }
 });
 
+app.get('/read',async(req,res)=>{
+  const data=await imageModel.find({});
+  res.send(data);
+})
+
 app.listen(3000, () => {
   console.log('Server is running on port 3000');
 });
